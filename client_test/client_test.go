@@ -1,11 +1,10 @@
 package client_test
 
-// You MUST NOT change these default imports.  ANY additional imports may
-// break the autograder and everyone will be sad.
+// 你绝对不能修改这些默认导入。任何额外导入都可能
+// 导致自动评分器失败，然后大家都会难过。
 
 import (
-	// Some imports use an underscore to prevent the compiler from complaining
-	// about unused imports.
+	// 某些导入使用下划线，避免编译器报“未使用导入”。
 	_ "encoding/hex"
 	_ "errors"
 	_ "strconv"
@@ -14,9 +13,9 @@ import (
 
 	_ "github.com/google/uuid"
 
-	// A "dot" import is used here so that the functions in the ginko and gomega
-	// modules can be used without an identifier. For example, Describe() and
-	// Expect() instead of ginko.Describe() and gomega.Expect().
+	// 这里使用了“点导入”，这样 ginkgo 和 gomega 模块中的函数
+	// 可以不带模块名前缀直接调用。例如可写 Describe()、
+	// Expect()，而不是 ginkgo.Describe() 和 gomega.Expect()。
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -31,7 +30,7 @@ func TestSetupAndExecution(t *testing.T) {
 }
 
 // ================================================
-// Global Variables (feel free to add more!)
+// 全局变量（可以按需继续添加！）
 // ================================================
 const defaultPassword = "password"
 const emptyString = ""
@@ -40,15 +39,15 @@ const contentTwo = "digital "
 const contentThree = "cryptocurrency!"
 
 // ================================================
-// Describe(...) blocks help you organize your tests
-// into functional categories. They can be nested into
-// a tree-like structure.
+// Describe(...) 代码块可以帮助你按功能组织测试。
+// 它们可以嵌套成
+// 树状结构。
 // ================================================
 
 var _ = Describe("Client Tests", func() {
 
-	// A few user declarations that may be used for testing. Remember to initialize these before you
-	// attempt to use them!
+	// 一些可能在测试中用到的用户声明。使用它们之前
+	// 记得先初始化！
 	var alice *client.User
 	var bob *client.User
 	var charles *client.User
@@ -59,14 +58,14 @@ var _ = Describe("Client Tests", func() {
 	// var horace *client.User
 	// var ira *client.User
 
-	// These declarations may be useful for multi-session testing.
+	// 这些声明在多会话测试中可能会有用。
 	var alicePhone *client.User
 	var aliceLaptop *client.User
 	var aliceDesktop *client.User
 
 	var err error
 
-	// A bunch of filenames that may be useful.
+	// 一组可能会用到的文件名。
 	aliceFile := "aliceFile.txt"
 	bobFile := "bobFile.txt"
 	charlesFile := "charlesFile.txt"
@@ -78,9 +77,9 @@ var _ = Describe("Client Tests", func() {
 	// iraFile := "iraFile.txt"
 
 	BeforeEach(func() {
-		// This runs before each test within this Describe block (including nested tests).
-		// Here, we reset the state of Datastore and Keystore so that tests do not interfere with each other.
-		// We also initialize
+		// 该代码会在这个 Describe 代码块中的每个测试前运行（包括嵌套测试）。
+		// 在这里我们重置 Datastore 和 Keystore 的状态，避免测试互相影响。
+		// 同时也进行初始化清理。
 		userlib.DatastoreClear()
 		userlib.KeystoreClear()
 	})

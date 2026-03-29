@@ -1,9 +1,9 @@
 package client
 
-// CS 161 Project 2
+// CS 161 项目 2
 
-// Only the following imports are allowed! ANY additional imports
-// may break the autograder!
+// 只允许使用以下导入！任何额外导入
+// 都可能导致自动评分器失败！
 // - bytes
 // - encoding/hex
 // - encoding/json
@@ -20,46 +20,46 @@ import (
 	userlib "github.com/cs161-staff/project2-userlib"
 	"github.com/google/uuid"
 
-	// hex.EncodeToString(...) is useful for converting []byte to string
+	// hex.EncodeToString(...) 可用于将 []byte 转换为 string
 
-	// Useful for string manipulation
+	// 用于字符串处理
 	"strings"
 
-	// Useful for formatting strings (e.g. `fmt.Sprintf`).
+	// 用于格式化字符串（例如 `fmt.Sprintf`）。
 	"fmt"
 
-	// Useful for creating new error messages to return using errors.New("...")
+	// 用于通过 errors.New("...") 创建并返回新的错误信息
 	"errors"
 
-	// Optional.
+	// 可选。
 	_ "strconv"
 )
 
-// This serves two purposes: it shows you a few useful primitives,
-// and suppresses warnings for imports not being used. It can be
-// safely deleted!
+// 这个函数有两个用途：展示一些有用的基础能力，
+// 以及抑制“导入未使用”的告警。它可以
+// 被安全删除！
 func someUsefulThings() {
 
-	// Creates a random UUID.
+	// 创建一个随机 UUID。
 	randomUUID := uuid.New()
 
-	// Prints the UUID as a string. %v prints the value in a default format.
-	// See https://pkg.go.dev/fmt#hdr-Printing for all Golang format string flags.
+	// 以字符串形式打印 UUID。%v 会按默认格式打印值。
+	// 参见 https://pkg.go.dev/fmt#hdr-Printing 了解 Golang 的格式化标志。
 	userlib.DebugMsg("Random UUID: %v", randomUUID.String())
 
-	// Creates a UUID deterministically, from a sequence of bytes.
+	// 根据一段字节序列确定性地创建 UUID。
 	hash := userlib.Hash([]byte("user-structs/alice"))
 	deterministicUUID, err := uuid.FromBytes(hash[:16])
 	if err != nil {
-		// Normally, we would `return err` here. But, since this function doesn't return anything,
-		// we can just panic to terminate execution. ALWAYS, ALWAYS, ALWAYS check for errors! Your
-		// code should have hundreds of "if err != nil { return err }" statements by the end of this
-		// project. You probably want to avoid using panic statements in your own code.
+		// 正常情况下这里会 `return err`。但这个函数没有返回值，
+		// 所以这里只能 panic 终止执行。一定、一定、一定要检查错误！到这个
+		// 项目结束时，你的代码里应该有大量 "if err != nil { return err }"。
+		// 在你自己的实现中，通常应尽量避免使用 panic。
 		panic(errors.New("An error occurred while generating a UUID: " + err.Error()))
 	}
 	userlib.DebugMsg("Deterministic UUID: %v", deterministicUUID.String())
 
-	// Declares a Course struct type, creates an instance of it, and marshals it into JSON.
+	// 声明一个 Course 结构体类型，创建实例并将其序列化为 JSON。
 	type Course struct {
 		name      string
 		professor []byte
@@ -74,17 +74,17 @@ func someUsefulThings() {
 	userlib.DebugMsg("Struct: %v", course)
 	userlib.DebugMsg("JSON Data: %v", courseBytes)
 
-	// Generate a random private/public keypair.
-	// The "_" indicates that we don't check for the error case here.
+	// 生成一对随机公私钥。
+	// "_" 表示这里不检查错误分支。
 	var pk userlib.PKEEncKey
 	var sk userlib.PKEDecKey
 	pk, sk, _ = userlib.PKEKeyGen()
 	userlib.DebugMsg("PKE Key Pair: (%v, %v)", pk, sk)
 
-	// Here's an example of how to use HBKDF to generate a new key from an input key.
-	// Tip: generate a new key everywhere you possibly can! It's easier to generate new keys on the fly
-	// instead of trying to think about all of the ways a key reuse attack could be performed. It's also easier to
-	// store one key and derive multiple keys from that one key, rather than
+	// 这里演示如何使用 HBKDF 从输入密钥派生一个新密钥。
+	// 小提示：能生成新密钥的地方尽量都生成新密钥！动态生成通常比
+	// 反复思考“密钥复用攻击”的所有可能路径更容易，也更安全。通常也更容易
+	// 保存一个主密钥，再从它派生多个用途密钥，而不是
 	originalKey := userlib.RandomBytes(16)
 	derivedKey, err := userlib.HashKDF(originalKey, []byte("mac-key"))
 	if err != nil {
@@ -93,33 +93,32 @@ func someUsefulThings() {
 	userlib.DebugMsg("Original Key: %v", originalKey)
 	userlib.DebugMsg("Derived Key: %v", derivedKey)
 
-	// A couple of tips on converting between string and []byte:
-	// To convert from string to []byte, use []byte("some-string-here")
-	// To convert from []byte to string for debugging, use fmt.Sprintf("hello world: %s", some_byte_arr).
-	// To convert from []byte to string for use in a hashmap, use hex.EncodeToString(some_byte_arr).
-	// When frequently converting between []byte and string, just marshal and unmarshal the data.
+	// 关于 string 和 []byte 转换的几个小提示：
+	// string 转 []byte：使用 []byte("some-string-here")
+	// []byte 转 string（用于调试）：使用 fmt.Sprintf("hello world: %s", some_byte_arr)。
+	// []byte 转 string（用于哈希表键）：使用 hex.EncodeToString(some_byte_arr)。
+	// 如果频繁在 []byte 和 string 间转换，直接对数据做序列化/反序列化通常更方便。
 	//
-	// Read more: https://go.dev/blog/strings
+	// 进一步阅读：https://go.dev/blog/strings
 
-	// Here's an example of string interpolation!
+	// 这里是一个字符串插值示例！
 	_ = fmt.Sprintf("%s_%d", "file", 1)
 }
 
-// This is the type definition for the User struct.
-// A Go struct is like a Python or Java class - it can have attributes
-// (e.g. like the Username attribute) and methods (e.g. like the StoreFile method below).
+// 这是 User 结构体的类型定义。
+// Go 的 struct 类似 Python 或 Java 中的类——可以有属性
+// （例如 Username）和方法（例如下方的 StoreFile）。
 type User struct {
 	Username string
 
-	// You can add other attributes here if you want! But note that in order for attributes to
-	// be included when this struct is serialized to/from JSON, they must be capitalized.
-	// On the flipside, if you have an attribute that you want to be able to access from
-	// this struct's methods, but you DON'T want that value to be included in the serialized value
-	// of this struct that's stored in datastore, then you can use a "private" variable (e.g. one that
-	// begins with a lowercase letter).
+	// 你可以在这里添加其他属性！但要注意，如果希望这些属性在结构体与 JSON
+	// 互相序列化时被包含，字段名首字母必须大写。
+	// 相反，如果某个字段希望仅在结构体方法内部可访问，
+	// 但不希望被写入 datastore 中保存的序列化结果，
+	// 那就可以使用“私有”字段（例如以小写字母开头的字段名）。
 }
 
-// NOTE: The following methods have toy (insecure!) implementations.
+// 注意：下面的方法只是示例实现（不安全！）。
 
 func InitUser(username string, password string) (userdataptr *User, err error) {
 	var userdata User

@@ -2,32 +2,36 @@ package client
 
 ///////////////////////////////////////////////////
 //                                               //
-// Everything in this file will NOT be graded!!! //
+// 本文件中的内容不会被评分！！！               //
 //                                               //
 ///////////////////////////////////////////////////
 
-// In this unit tests file, you can write white-box unit tests on your implementation.
-// These are different from the black-box integration tests in client_test.go,
-// because in this unit tests file, you can use details specific to your implementation.
+// 在这个单元测试文件中，你可以为自己的实现编写白盒测试。
+// 这和 client_test.go 里的黑盒集成测试不同，
+// 因为这里可以使用你实现中的内部细节。
 
-// For example, in this unit tests file, you can access struct fields and helper methods
-// that you defined, but in the integration tests (client_test.go), you can only access
-// the 8 functions (StoreFile, LoadFile, etc.) that are common to all implementations.
+// 例如，在这个单元测试文件里，你可以访问自己定义的结构体字段和辅助方法；
+// 但在集成测试（client_test.go）中，你只能访问
+// 所有实现都共有的 8 个函数（StoreFile、LoadFile 等）。
 
-// In this unit tests file, you can write InitUser where you would write client.InitUser in the
-// integration tests (client_test.go). In other words, the "client." in front is no longer needed.
+// 在这个单元测试文件中，你可以直接写 InitUser；而在
+// 集成测试（client_test.go）中则要写 client.InitUser。也就是说，这里不再需要前缀 "client."。
 
 import (
-	userlib "github.com/cs161-staff/project2-userlib"
 	"testing"
-)
 
-import (
+	userlib "github.com/cs161-staff/project2-userlib"
+
 	_ "encoding/hex"
+
 	_ "errors"
+
 	. "github.com/onsi/ginkgo/v2"
+
 	. "github.com/onsi/gomega"
+
 	_ "strconv"
+
 	_ "strings"
 )
 
@@ -46,14 +50,14 @@ var _ = Describe("Client Unit Tests", func() {
 	Describe("Unit Tests", func() {
 		Specify("Basic Test: Check that the Username field is set for a new user", func() {
 			userlib.DebugMsg("Initializing user Alice.")
-			// Note: In the integration tests (client_test.go) this would need to
-			// be client.InitUser, but here (client_unittests.go) you can write InitUser.
+			// 注意：在集成测试（client_test.go）里这里应写
+			// client.InitUser；但在这里（client_unittests.go）可直接写 InitUser。
 			alice, err := InitUser("alice", "password")
 			Expect(err).To(BeNil())
 
-			// Note: You can access the Username field of the User struct here.
-			// But in the integration tests (client_test.go), you cannot access
-			// struct fields because not all implementations will have a username field.
+			// 注意：这里可以访问 User 结构体的 Username 字段。
+			// 但在集成测试（client_test.go）中不能访问结构体字段，
+			// 因为并不是所有实现都一定有 username 这个字段。
 			Expect(alice.Username).To(Equal("alice"))
 		})
 	})
