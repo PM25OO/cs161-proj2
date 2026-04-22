@@ -111,6 +111,14 @@ func someUsefulThings() {
 type User struct {
 	Username string
 
+	pkePblicKey   userlib.PKEEncKey // 加密公钥
+	PKEPrivateKey userlib.PKEDecKey // 解密私钥
+
+	dsVerifyKey userlib.DSVerifyKey // 认证公钥
+	DSSignKey   userlib.DSSignKey   // 签名私钥
+
+	rootKey []byte
+
 	// 你可以在这里添加其他属性！但要注意，如果希望这些属性在结构体与 JSON
 	// 互相序列化时被包含，字段名首字母必须大写。
 	// 相反，如果某个字段希望仅在结构体方法内部可访问，
@@ -118,11 +126,36 @@ type User struct {
 	// 那就可以使用“私有”字段（例如以小写字母开头的字段名）。
 }
 
-// 注意：下面的方法只是示例实现（不安全！）。
-
 func InitUser(username string, password string) (userdataptr *User, err error) {
+	_, ok := userlib.KeystoreGet(username)
+	if ok {
+		return nil, errors.New("user already exists")
+	}
+
 	var userdata User
 	userdata.Username = username
+	userdata.pkePblicKey, userdata.PKEPrivateKey, _ = userlib.PKEKeyGen()
+	userdata.DSSignKey, userdata.dsVerifyKey, _ = userlib.DSKeyGen()
+
+	// 存储公钥
+	userlib.KeystoreSet(username, userdata.pkePblicKey)
+	userlib.KeystoreSet(username+"_ds", userdata.dsVerifyKey)
+
+	// 根据password加盐username派生rootKey
+	userdata.rootKey = userlib.Argon2Key([]byte(password), []byte(username), 16)
+
+	// 序列化User并加密存储
+	userBytes, err := json.Marshal(userdata)
+	if err != nil {
+		return nil, errors.New("failed to marshal user data")
+	}
+	cyphertext := userlib.SymEnc(userdata.rootKey, userlib.RandomBytes(16), userBytes)
+	uuid, err := uuid.FromBytes([]byte(username))
+	if err != nil {
+		return nil, errors.New("failed to generate UUID from username")
+	}
+	userlib.DatastoreSet(uuid, cyphertext)
+
 	return &userdata, nil
 }
 
