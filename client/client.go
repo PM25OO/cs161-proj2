@@ -160,7 +160,31 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 }
 
 func GetUser(username string, password string) (userdataptr *User, err error) {
+	_, ok := userlib.KeystoreGet(username)
+	if !ok {
+		return nil, errors.New("user does not exist")
+	}
+
+	// 根据password加盐username派生rootKey
+	key := userlib.Argon2Key([]byte(password), []byte(username), 16)
+
+	uuid, err := uuid.FromBytes([]byte(username))
+	if err != nil {
+		return nil, errors.New("failed to generate UUID from username")
+	}
+	bytes, ok := userlib.DatastoreGet(uuid)
+	if !ok {
+		return nil, errors.New("failed to retrieve user data")
+	}
+
+	// 解密并反序列化User
+	plaintext := userlib.SymDec(key, bytes)
 	var userdata User
+	err = json.Unmarshal(plaintext, &userdata)
+	if err != nil {
+		return nil, errors.New("failed to unmarshal user data")
+	}
+
 	userdataptr = &userdata
 	return userdataptr, nil
 }
