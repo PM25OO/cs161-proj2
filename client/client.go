@@ -126,6 +126,13 @@ type User struct {
 	// 那就可以使用“私有”字段（例如以小写字母开头的字段名）。
 }
 
+type File struct {
+	Filename string
+	Owner    string
+
+	Content []byte
+}
+
 func InitUser(username string, password string) (userdataptr *User, err error) {
 	_, ok := userlib.KeystoreGet(username)
 	if ok {
@@ -195,16 +202,23 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 }
 
 func (userdata *User) StoreFile(filename string, content []byte) (err error) {
+	var userfile File
+	userfile.Filename = filename
+	userfile.Owner = userdata.Username
+	userfile.Content = content
+
+	// 序列化并加密文件数据
+	contentBytes, err := json.Marshal(userfile)
+	if err != nil {
+		return err
+	}
+	ciphertext := userlib.SymEnc(userdata.RootKey, userlib.RandomBytes(16), contentBytes)
 	storageKey, err := uuid.FromBytes(userlib.Hash([]byte(filename + userdata.Username))[:16])
 	if err != nil {
 		return err
 	}
-	contentBytes, err := json.Marshal(content)
-	if err != nil {
-		return err
-	}
-	userlib.DatastoreSet(storageKey, contentBytes)
-	return
+	userlib.DatastoreSet(storageKey, ciphertext)
+	return nil
 }
 
 func (userdata *User) AppendToFile(filename string, content []byte) error {
