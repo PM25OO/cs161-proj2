@@ -117,7 +117,7 @@ type User struct {
 	dsVerifyKey userlib.DSVerifyKey // 认证公钥
 	DSSignKey   userlib.DSSignKey   // 签名私钥
 
-	rootKey []byte
+	RootKey []byte
 
 	// 你可以在这里添加其他属性！但要注意，如果希望这些属性在结构体与 JSON
 	// 互相序列化时被包含，字段名首字母必须大写。
@@ -142,14 +142,14 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userlib.KeystoreSet(username+"_ds", userdata.dsVerifyKey)
 
 	// 根据password加盐username派生rootKey
-	userdata.rootKey = userlib.Argon2Key([]byte(password), []byte(username), 16)
+	userdata.RootKey = userlib.Argon2Key([]byte(password), []byte(username), 16)
 
 	// 序列化User并加密存储
 	userBytes, err := json.Marshal(userdata)
 	if err != nil {
 		return nil, errors.New("failed to marshal user data")
 	}
-	cyphertext := userlib.SymEnc(userdata.rootKey, userlib.RandomBytes(16), userBytes)
+	cyphertext := userlib.SymEnc(userdata.RootKey, userlib.RandomBytes(16), userBytes)
 	uuid, err := uuid.FromBytes([]byte(username))
 	if err != nil {
 		return nil, errors.New("failed to generate UUID from username")
