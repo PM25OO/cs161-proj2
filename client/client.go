@@ -185,6 +185,11 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 		return nil, errors.New("failed to unmarshal user data")
 	}
 
+	// 验证数据完整性
+	if userdata.Username != username {
+		return nil, errors.New("data integrity check failed")
+	}
+
 	userdataptr = &userdata
 	return userdataptr, nil
 }
