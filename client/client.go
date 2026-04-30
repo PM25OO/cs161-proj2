@@ -236,12 +236,18 @@ func (userdata *User) LoadFile(filename string) (content []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	dataJSON, ok := userlib.DatastoreGet(storageKey)
+	response, ok := userlib.DatastoreGet(storageKey)
 	if !ok {
 		return nil, errors.New(strings.ToTitle("file not found"))
 	}
-	err = json.Unmarshal(dataJSON, &content)
-	return content, err
+
+	contentBytes := userlib.SymDec(userdata.RootKey, response)
+	var userfile File
+	err = json.Unmarshal([]byte(contentBytes), &userfile)
+	if err != nil {
+		return nil, err
+	}
+	return userfile.Content, err
 }
 
 func (userdata *User) CreateInvitation(filename string, recipientUsername string) (
