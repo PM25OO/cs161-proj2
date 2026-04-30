@@ -117,7 +117,11 @@ type User struct {
 	dsVerifyKey userlib.DSVerifyKey // 认证公钥
 	DSSignKey   userlib.DSSignKey   // 签名私钥
 
-	RootKey []byte
+	RootKey  []byte
+	FileKeys map[string]userlib.UUID
+
+	OwnedFiles  []string
+	SharedFiles map[string]string
 
 	// 你可以在这里添加其他属性！但要注意，如果希望这些属性在结构体与 JSON
 	// 互相序列化时被包含，字段名首字母必须大写。
@@ -143,6 +147,8 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userdata.Username = username
 	userdata.pkePblicKey, userdata.PKEPrivateKey, _ = userlib.PKEKeyGen()
 	userdata.DSSignKey, userdata.dsVerifyKey, _ = userlib.DSKeyGen()
+	userdata.FileKeys = make(map[string]userlib.UUID)
+	userdata.SharedFiles = make(map[string]string)
 
 	// 存储公钥
 	userlib.KeystoreSet(username, userdata.pkePblicKey)
